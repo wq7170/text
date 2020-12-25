@@ -1,0 +1,31 @@
+$bannerHeight: .5rem;
+
+.top {
+    height: $bannerHeight;
+}
+
+.fixWrap {
+    position: fixed;
+    height: $bannerHeight;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    background-color: gray;
+}
+
+.close {
+    width: .5rem;
+    height: .26rem;
+    color: #fff;
+    border-radius: .04rem;
+    font-size: .12rem;
+    text-align: center;
+    line-height: .26rem;
+    margin-right: .2rem;
+    background-color: #108ee9;
+
+    &:active {
+        background-color: #0e80d2;
+    }
+}

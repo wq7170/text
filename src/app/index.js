@@ -12,12 +12,16 @@ class App extends React.Component {
         this.store = new Store();
     }
 
+    componentWillUnmount() {
+        this.store.destory();
+    }
+
     render() {
-        const { isEditor } = this.store;
+        const { showEditor } = this.store;
         return (
             <Provider store={this.store}>
                 <div className={s.app}>
-                    {isEditor ? <Editor /> : <List />}
+                    {showEditor ? <Editor /> : <List />}
                 </div>
             </Provider>
         );

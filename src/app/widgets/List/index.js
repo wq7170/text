@@ -2,12 +2,12 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { SwipeAction, List } from 'antd-mobile';
 import dayjs from 'dayjs';
+import BaseComponent from '../../common/BaseComponent';
 import s from './index.module.scss';
 
 @inject('store')
 @observer
-class NoteList extends React.Component {
-    store = this.props.store;
+class NoteList extends BaseComponent {
 
     onCreateNote = () => {
         this.store.onCreateNote();
@@ -15,6 +15,10 @@ class NoteList extends React.Component {
 
     onDeleteNote = (id) => {
         this.store.onDeleteNote(id);
+    }
+
+    onItemClick(item) {
+        this.store.onShowEditor(item);
     }
 
     render() {
@@ -38,10 +42,10 @@ class NoteList extends React.Component {
                                             style: { backgroundColor: '#F4333C', color: 'white' },
                                         },
                                     ]}
-                                    onOpen={() => console.log('global open')}
+                                    onOpen={this.onItemClick.bind(this, item)}
                                 >
                                     <List.Item
-                                        onClick={e => console.log(e)}
+                                        onClick={this.onItemClick.bind(this, item)}
                                     >
                                         <div className={s.item}>
                                             <div className={s.title}>{text || '新建文本'}</div>

@@ -1,0 +1,1 @@
+export const StorageKey = 'note_storage_key';
