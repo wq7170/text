@@ -14,7 +14,7 @@ class EditorCore extends BaseComponent {
     isCompositionStart = false;
     state = {
         activeBlockId: this.noteStore.nodes[0].id,
-        toStart: true,
+        offset: 0,
     }
 
     componentDidMount() {
@@ -27,16 +27,12 @@ class EditorCore extends BaseComponent {
             // 目标block变动
             const targetNode = document.getElementById(this.state.activeBlockId);
             const range = new Range();
-            if (this.state.toStart) {
-                range.setStart(targetNode, 0);
+            const offset = this.state.offset;
+            if (targetNode.firstChild) {
+                range.setStart(targetNode.firstChild, offset);
+                range.setEnd(targetNode.firstChild, offset);
             } else {
-                const { curActiveNode } = this.noteStore;
-                if (targetNode.firstChild) {
-                    range.setStart(targetNode.firstChild, targetNode.firstChild.length);
-                    range.setEnd(targetNode.firstChild, targetNode.firstChild.length);
-                } else {
-                    range.setStart(targetNode, 0);
-                }
+                range.setStart(targetNode, offset);
             }
             
             document.getSelection().removeAllRanges();
@@ -99,17 +95,20 @@ class EditorCore extends BaseComponent {
                 targetBlock.deleteText(startRange.offset - 1, 1);
                 startRange.offset = 0;
             } else {
+                let offset = 0;
                 if (curActiveNode.text.length) {
                     const curIdx = this.noteStore.findTargetNodeIdxById(curActiveNode.id);
                     if (curIdx > 0) {
                         const preNode = this.noteStore.nodes[curIdx - 1];
+                        offset = preNode.text.length;
                         preNode.insertText(curActiveNode.text, preNode.text.length);
+                        preNode.activeOffsetEnd = offset;
                     }
                 }
                 const newTargetNode = this.noteStore.onDeleteBlock(targetBlock.id);
                 this.setState({
                     activeBlockId: newTargetNode.id,
-                    toStart: false,
+                    offset: offset || newTargetNode.text.length,
                 });
             }
             event.preventDefault();
@@ -126,7 +125,7 @@ class EditorCore extends BaseComponent {
             }
             this.setState({
                 activeBlockId: newNode.id,
-                toStart: true,
+                offset: 0,
             });
             event.preventDefault();
         }
