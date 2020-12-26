@@ -10,6 +10,9 @@ class Editor extends BaseComponent {
 
     onNoteClose = () => {
         this.store.onCloseEditor();
+        this.store.targetNote.refreshContent();
+        const content = this.store.targetNote.toJson();
+        localStorage.setItem(this.store.targetNote.id, JSON.stringify(content));
     }
 
     render() {

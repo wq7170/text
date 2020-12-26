@@ -17,8 +17,8 @@ export default class TextStore {
     }
 
     deleteText(start, num) {
-        this.activeOffsetEnd = start - num;
-        this.text = this.text.slice(0, this.activeOffsetEnd) + this.text.slice(start);
+        this.activeOffsetEnd = start;
+        this.text = this.text.slice(0, start) + this.text.slice(start + num);
     }
 
     getText() {

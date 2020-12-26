@@ -3,12 +3,15 @@ import { inject, observer } from 'mobx-react';
 import BaseComponent from '../../common/BaseComponent';
 import Text from '../Text';
 import { isRangeInNode, getRangeInfo } from '../../../utils/selection';
+import { observable } from 'mobx';
+import s from './index.module.scss';
 
 @inject('store')
 @observer
 class EditorCore extends BaseComponent {
     noteStore = this.store.targetNote;
     editorRef = React.createRef();
+    isCompositionStart = false;
     state = {
         activeBlockId: this.noteStore.nodes[0].id,
         toStart: true,
@@ -50,6 +53,9 @@ class EditorCore extends BaseComponent {
         if (!isRangeInNode(this.editorRef.current)) {
             return;
         }
+        if (this.isCompositionStart) {
+            return;
+        }
         const {
             startNodeId,
             startNodeOffset,
@@ -74,6 +80,58 @@ class EditorCore extends BaseComponent {
         this.noteStore.isCollapsed = collapsed;
     }
 
+    onKeyDown = (event) => {
+        const {
+            startRange,
+            endRange,
+            isCollapsed,
+            curActiveNode,
+        } = this.noteStore;
+        if (event.code === 'Backspace') {
+            const targetBlock = startRange.block;
+            if (!targetBlock) {
+                return;
+            }
+            if (startRange.offset > 1) {
+                targetBlock.deleteText(startRange.offset - 1, 1);
+            } else if (startRange.offset === 1) {
+                // 最后一个元素没有触发selectionchange事件。。。
+                targetBlock.deleteText(startRange.offset - 1, 1);
+                startRange.offset = 0;
+            } else {
+                if (curActiveNode.text.length) {
+                    const curIdx = this.noteStore.findTargetNodeIdxById(curActiveNode.id);
+                    if (curIdx > 0) {
+                        const preNode = this.noteStore.nodes[curIdx - 1];
+                        preNode.insertText(curActiveNode.text, preNode.text.length);
+                    }
+                }
+                const newTargetNode = this.noteStore.onDeleteBlock(targetBlock.id);
+                this.setState({
+                    activeBlockId: newTargetNode.id,
+                    toStart: false,
+                });
+            }
+            event.preventDefault();
+        } else if (event.code === 'Enter') {
+            const targetBlock = endRange.block;
+            let newNode;
+            if (endRange.offset === targetBlock.text.length) {
+                // 段尾换行
+                newNode = this.noteStore.onInsertBlock(targetBlock.id);
+            } else {
+                const text = targetBlock.text.slice(endRange.offset);
+                targetBlock.deleteText(endRange.offset, targetBlock.text.length - endRange.offset);
+                newNode = this.noteStore.onInsertBlock(targetBlock.id, text);
+            }
+            this.setState({
+                activeBlockId: newNode.id,
+                toStart: true,
+            });
+            event.preventDefault();
+        }
+    }
+
     onTextInput = (event) => {
         event.preventDefault();
         const text = event.data;
@@ -91,50 +149,26 @@ class EditorCore extends BaseComponent {
         }
     }
 
-    onKeyDown = (event) => {
-        const {
-            startRange,
-            endRange,
-            isCollapsed,
-        } = this.noteStore;
-        if (event.code === 'Backspace') {
-            const targetBlock = startRange.block;
-            if (!targetBlock) {
-                return;
-            }
-            if (startRange.offset > 1) {
-                targetBlock.deleteText(startRange.offset, 1);
-            } else if (startRange.offset === 1) {
-                // 最后一个元素没有触发selectionchange事件。。。
-                targetBlock.deleteText(startRange.offset, 1);
-                startRange.offset = 0;
-            } else {
-                const newTargetNode = this.noteStore.onDeleteBlock(targetBlock.id);
-                this.setState({
-                    activeBlockId: newTargetNode.id,
-                    toStart: false,
-                });
-            }
-            event.preventDefault();
-        } else if (event.code === 'Enter') {
-            const targetBlock = endRange.block;
-            const newNode = this.noteStore.onInsertBlock(targetBlock.id);
-            this.setState({
-                activeBlockId: newNode.id,
-                toStart: true,
-            });
-            event.preventDefault();
-        }
+    onCompositionStart = (evt) => {
+        evt.preventDefault();
+        this.isCompositionStart = true;
+    }
+
+    onCompositionEnd = (evt) => {
+        evt.preventDefault();
+        this.isCompositionStart = false;
     }
 
     render() {
         const { nodes } = this.noteStore;
         return (
             <div
+                className={s.editor}
                 ref={this.editorRef}
                 contentEditable
                 onKeyDown={this.onKeyDown}
-                onSelectionChange={this.onInput}
+                onCompositionStart={this.onCompositionStart}
+                onCompositionEnd={this.onCompositionEnd}
             >
                 {
                     nodes.map((item) => {

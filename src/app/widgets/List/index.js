@@ -47,7 +47,7 @@ class NoteList extends BaseComponent {
                                         onClick={this.onItemClick.bind(this, item)}
                                     >
                                         <div className={s.item}>
-                                            <div className={s.title}>{item.getContent() || '新建文本'}</div>
+                                            <div className={s.title}>{item.content || '新建文本'}</div>
                                             <div className={s.time}>{dayjs(noteId).format('YYYY-MM-DD HH:mm:ss')}</div>
                                         </div>
                                     </List.Item>
