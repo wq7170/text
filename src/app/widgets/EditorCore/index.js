@@ -145,13 +145,11 @@ class EditorCore extends BaseComponent {
             endRange,
             isCollapsed,
         } = this.noteStore;
-        if (isCollapsed) {
-            const targetBlock = startRange.block;
-            if (!targetBlock) {
-                return;
-            }
-            targetBlock.insertText(text, startRange.offset);
+        const targetBlock = startRange.block;
+        if (!targetBlock) {
+            return;
         }
+        targetBlock.insertText(text, startRange.offset);
     }
 
     onCompositionStart = (evt) => {
