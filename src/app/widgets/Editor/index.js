@@ -1,7 +1,7 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
-import { Button } from 'antd-mobile';
 import BaseComponent from '../../common/BaseComponent';
+import EditorCore from '../EditorCore';
 import s from './index.module.scss';
 
 @inject('store')
@@ -21,7 +21,7 @@ class Editor extends BaseComponent {
                     </div>
                 </div>
                 <div>
-                    我这里是编辑页
+                    <EditorCore />
                 </div>
             </div>
         )

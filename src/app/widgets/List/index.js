@@ -29,27 +29,26 @@ class NoteList extends BaseComponent {
                 <List>
                     {
                         noteList.map((item, idx) => {
-                            const { id, text } = item;
+                            const { noteId } = item;
                             return (
                                 <SwipeAction
-                                    key={`${id}_${idx}`}
+                                    key={`${noteId}_${idx}`}
                                     style={{ backgroundColor: 'gray' }}
                                     autoClose
                                     right={[
                                         {
                                             text: '删除',
-                                            onPress: () => this.onDeleteNote(id),
+                                            onPress: () => this.onDeleteNote(noteId),
                                             style: { backgroundColor: '#F4333C', color: 'white' },
                                         },
                                     ]}
-                                    onOpen={this.onItemClick.bind(this, item)}
                                 >
                                     <List.Item
                                         onClick={this.onItemClick.bind(this, item)}
                                     >
                                         <div className={s.item}>
-                                            <div className={s.title}>{text || '新建文本'}</div>
-                                            <div className={s.time}>{dayjs(id).format('YYYY-MM-DD HH:mm:ss')}</div>
+                                            <div className={s.title}>{item.getContent() || '新建文本'}</div>
+                                            <div className={s.time}>{dayjs(noteId).format('YYYY-MM-DD HH:mm:ss')}</div>
                                         </div>
                                     </List.Item>
                                 </SwipeAction>

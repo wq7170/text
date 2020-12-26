@@ -1,5 +1,6 @@
 import { observable, action, reaction, runInAction } from 'mobx';
 import { StorageKey } from './constants';
+import NoteStore from './widgets/EditorCore/store';
 
 export default class Store {
 
@@ -11,7 +12,8 @@ export default class Store {
                     const noteIds = JSON.parse(ids);
                     noteIds.forEach(id => {
                         try {
-                            this.noteList = this.noteList.concat(JSON.parse(localStorage.getItem(id)));
+                            const noteStore = new NoteStore(this, JSON.parse(localStorage.getItem(id)));
+                            this.noteList = this.noteList.concat(noteStore);
                         } catch {
                             console.log(`note id: ${id} init failed`);
                         }
@@ -27,7 +29,7 @@ export default class Store {
         });
     }
 
-    @observable noteList = [];
+    @observable.ref noteList = [];
     @observable showEditor = false;
     @observable targetNote = null;
     
@@ -38,12 +40,12 @@ export default class Store {
 
     @action.bound
     onCreateNote() {
-        const note = {
+        const noteStore = new NoteStore(this, {
             id: Date.now(),
-            text: '',
-        };
-        localStorage.setItem(note.id, JSON.stringify(note));
-        this.noteList = this.noteList.concat(note);
+            noteInfo: [],
+        });
+        localStorage.setItem(noteStore.id, JSON.stringify(noteStore.toJson()));
+        this.noteList = this.noteList.concat(noteStore);
     }
 
     @action.bound
