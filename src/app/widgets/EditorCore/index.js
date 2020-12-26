@@ -83,6 +83,9 @@ class EditorCore extends BaseComponent {
     }
 
     onKeyDown = (event) => {
+        if (this.isCompositionStart) {
+            return;
+        }
         const {
             startRange,
             endRange,

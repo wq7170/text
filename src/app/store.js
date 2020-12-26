@@ -1,6 +1,6 @@
 import { observable, action, reaction, runInAction } from 'mobx';
 import NoteStore from './widgets/EditorCore/store';
-import { getPageListIds, getPageInfoById, savePageList, savaPageInfo } from '../utils/request';
+import { getPageListIds, getPageInfoById, savePageList, savaPageInfo, deletePageById } from '../utils/request';
 
 export default class Store {
 
@@ -42,8 +42,8 @@ export default class Store {
 
     @action.bound
     onDeleteNote(id) {
-        localStorage.removeItem(id);
-        this.noteList = this.noteList.filter(item => item.id !== id);
+        deletePageById(id);
+        this.noteList = this.noteList.filter(item => item.noteId !== id);
     }
 
     @action.bound

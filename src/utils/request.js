@@ -12,3 +12,5 @@ export const getPageInfoById = (id) => new Promise((res, rej) => {
 export const savePageList = (info) => localStorage.setItem(StorageKey, JSON.stringify(info));
 
 export const savaPageInfo = (id, info) => localStorage.setItem(id, JSON.stringify(info));
+
+export const deletePageById = (id) => localStorage.removeItem(id);
