@@ -2,6 +2,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import BaseComponent from '../../common/BaseComponent';
 import EditorCore from '../EditorCore';
+import { savaPageInfo } from '../../../utils/request';
 import s from './index.module.scss';
 
 @inject('store')
@@ -11,8 +12,7 @@ class Editor extends BaseComponent {
     onNoteClose = () => {
         this.store.onCloseEditor();
         this.store.targetNote.refreshContent();
-        const content = this.store.targetNote.toJson();
-        localStorage.setItem(this.store.targetNote.noteId, JSON.stringify(content));
+        savaPageInfo(this.store.targetNote.noteId, this.store.targetNote.toJson());
     }
 
     render() {

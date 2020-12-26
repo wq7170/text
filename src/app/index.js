@@ -1,29 +1,23 @@
 import React from 'react';
-import { Provider, observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import List from './widgets/List';
 import Editor from './widgets/Editor';
 import Store from './store';
 import s from './index.module.scss';
 
+@inject('store')
 @observer
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.store = new Store();
-    }
-
     componentWillUnmount() {
         this.store.destory();
     }
 
     render() {
-        const { showEditor } = this.store;
+        const { showEditor } = this.props.store;
         return (
-            <Provider store={this.store}>
-                <div className={s.app}>
-                    {showEditor ? <Editor /> : <List />}
-                </div>
-            </Provider>
+            <div className={s.app}>
+                {showEditor ? <Editor /> : <List />}
+            </div>
         );
     }
 }

@@ -1,37 +1,29 @@
 import { observable, action, reaction, runInAction } from 'mobx';
-import { StorageKey } from './constants';
 import NoteStore from './widgets/EditorCore/store';
+import { getPageListIds, getPageInfoById, savePageList } from '../utils/request';
 
 export default class Store {
-
-    constructor() {
-        const ids = localStorage.getItem(StorageKey);
-        if (ids) {
-            try {
-                runInAction(() => {
-                    const noteIds = JSON.parse(ids);
-                    noteIds.forEach(id => {
-                        try {
-                            const noteStore = new NoteStore(this, JSON.parse(localStorage.getItem(id)));
-                            this.noteList = this.noteList.concat(noteStore);
-                        } catch {
-                            console.log(`note id: ${id} init failed`);
-                        }
-                    })
-                });
-            } catch (e) {
-                this.noteList = [];
-            }
-        }
-
-        this.autoSaveReaction = reaction(() => this.noteList.length, () => {
-            localStorage.setItem(StorageKey, JSON.stringify(this.noteList.map(item => item.id)));
-        });
-    }
 
     @observable.ref noteList = [];
     @observable showEditor = false;
     @observable targetNote = null;
+
+    @action.bound
+    async initStore() {
+        const noteIds = await getPageListIds();
+        const res = await Promise.all(noteIds.map((id) => getPageInfoById(id)));
+        runInAction(() => {
+            try {
+                this.noteList = res.map(item => new NoteStore(this, item));
+            } catch {
+                this.noteList = [];
+            }
+        });
+
+        this.autoSaveReaction = reaction(() => this.noteList.length, () => {
+            savePageList(this.noteList.map(item => item.id));
+        });
+    }
     
 
     destory() {
