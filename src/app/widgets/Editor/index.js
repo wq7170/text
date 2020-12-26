@@ -20,7 +20,7 @@ class Editor extends BaseComponent {
             <div>
                 <div className={s.top}>
                     <div className={s.fixWrap}>
-                        <div className={s.close} onClick={this.onNoteClose}>关闭</div>
+                        <div className={s.close} onClick={this.onNoteClose}>保持并退出</div>
                     </div>
                 </div>
                 <div>

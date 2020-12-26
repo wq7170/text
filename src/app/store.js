@@ -1,6 +1,6 @@
 import { observable, action, reaction, runInAction } from 'mobx';
 import NoteStore from './widgets/EditorCore/store';
-import { getPageListIds, getPageInfoById, savePageList } from '../utils/request';
+import { getPageListIds, getPageInfoById, savePageList, savaPageInfo } from '../utils/request';
 
 export default class Store {
 
@@ -21,7 +21,7 @@ export default class Store {
         });
 
         this.autoSaveReaction = reaction(() => this.noteList.length, () => {
-            savePageList(this.noteList.map(item => item.id));
+            savePageList(this.noteList.map(item => item.noteId));
         });
     }
     
@@ -36,7 +36,7 @@ export default class Store {
             id: Date.now(),
             noteInfo: [],
         });
-        localStorage.setItem(noteStore.id, JSON.stringify(noteStore.toJson()));
+        savaPageInfo(noteStore.noteId, noteStore.toJson());
         this.noteList = this.noteList.concat(noteStore);
     }
 

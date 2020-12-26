@@ -20,29 +20,35 @@ class EditorCore extends BaseComponent {
     componentDidMount() {
         document.addEventListener('selectionchange', this.onSelectionChange);
         this.editorRef.current.addEventListener('textInput', this.onTextInput);
+        setTimeout(() => {
+            this.onAdjustCursor();
+        }, 0);
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.activeBlockId !== this.state.activeBlockId) {
-            // 目标block变动
-            const targetNode = document.getElementById(this.state.activeBlockId);
-            const range = new Range();
-            const offset = this.state.offset;
-            if (targetNode.firstChild) {
-                range.setStart(targetNode.firstChild, offset);
-                range.setEnd(targetNode.firstChild, offset);
-            } else {
-                range.setStart(targetNode, offset);
-            }
-            
-            document.getSelection().removeAllRanges();
-            document.getSelection().addRange(range);
+            this.onAdjustCursor();
         }
     }
 
     componentWillUnmount() {
         document.removeEventListener('selectionchange', this.onSelectionChange);
         this.editorRef.current.removeEventListener('textInput', this.onTextInput);
+    }
+
+    onAdjustCursor = () => {
+        const targetNode = document.getElementById(this.state.activeBlockId);
+        const range = new Range();
+        const offset = this.state.offset;
+        if (targetNode.firstChild) {
+            range.setStart(targetNode.firstChild, offset);
+            range.setEnd(targetNode.firstChild, offset);
+        } else {
+            range.setStart(targetNode, offset);
+        }
+        
+        document.getSelection().removeAllRanges();
+        document.getSelection().addRange(range);
     }
 
     onSelectionChange = () => {
